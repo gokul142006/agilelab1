@@ -6,20 +6,23 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/gokul142006/agilelab1.git'
             }
         }
-        stage('Generate Report') {
-            when {
-                branch 'main'
-            }
-            steps {
-                bat 'python app.py'
+        stage('Parallel Checks') {
+            parallel {
+                stage('Frontend Check') {
+                    steps {
+                        bat 'python frontend_check.py'
+                    }
+                }
+                stage('Backend Check') {
+                    steps {
+                        bat 'python backend_check.py'
+                    }
+                }
             }
         }
-        stage('Archive Report') {
-            when {
-                branch 'main'
-            }
+        stage('Summary') {
             steps {
-                archiveArtifacts artifacts: 'report.txt', fingerprint: true
+                echo 'Both frontend and backend checks are complete.'
             }
         }
     }
